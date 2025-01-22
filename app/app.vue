@@ -1,7 +1,13 @@
 <script setup>
 useHead({
-  title: 'Nuxt 3 PrimeVue Starter',
-})
+  title: 'Liga Darta elo',
+  meta: [
+    {
+      name: 'robots',
+      content: 'noindex',
+    },
+  ],
+});
 </script>
 
 <template>
@@ -10,6 +16,6 @@ useHead({
   </NuxtLayout>
 </template>
 
-<style lang='scss'>
+<style lang="scss">
 @use 'App.scss';
 </style>

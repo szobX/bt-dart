@@ -8,6 +8,7 @@ const isOnMobile = useState<boolean>('isOnMobile');
     <ConfirmDialog />
     <Toast />
     <div id="normal" :class="[{ collapsed }, { mobile: isOnMobile }]">
+      <AppUserTopbar />
       <div>
         <slot />
       </div>

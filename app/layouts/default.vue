@@ -1,6 +1,6 @@
-<script setup lang='ts'>
-const collapsed = useState<boolean>('collapsed')
-const isOnMobile = useState<boolean>('isOnMobile')
+<script setup lang="ts">
+const collapsed = useState<boolean>('collapsed');
+const isOnMobile = useState<boolean>('isOnMobile');
 </script>
 
 <template>
@@ -17,6 +17,4 @@ const isOnMobile = useState<boolean>('isOnMobile')
   </div>
 </template>
 
-<style lang="scss">
-
-</style>
+<style lang="scss"></style>

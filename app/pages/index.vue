@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-// definePageMeta({
-//   redirect: '/login',
-// });
+definePageMeta({
+  layout: 'normal',
+});
 </script>
 <template>
   <div class="flex flex-col items-center justify-center h-screen">
