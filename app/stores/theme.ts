@@ -1,7 +1,7 @@
-import { acceptHMRUpdate, defineStore } from 'pinia'
+import { acceptHMRUpdate, defineStore } from 'pinia';
 
 export function updateTheme(themeName: string, themeColor: string) {
-  return `/themes/${themeName}-${themeColor}/theme.css`
+  return `/themes/${themeName}-${themeColor}/theme.css`;
 }
 
 export const useThemeStore = defineStore('theme', {
@@ -13,19 +13,16 @@ export const useThemeStore = defineStore('theme', {
   // optional getters
   getters: {
     theme: (state) => {
-      return `${state.themeName}-${state.themeColor}`
+      return `${state.themeName}-${state.themeColor}`;
     },
   },
   // optional actions
   actions: {
     setTheme(themeName: string) {
-      this.themeName = themeName
+      this.themeName = themeName;
     },
     setColor(colorName: string) {
-      this.themeColor = colorName
+      this.themeColor = colorName;
     },
   },
-})
-
-if (import.meta.hot)
-  import.meta.hot.accept(acceptHMRUpdate(useThemeStore, import.meta.hot))
+});

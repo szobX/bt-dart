@@ -1,5 +1,5 @@
-import Aura from '@primevue/themes/aura'
-import pkg from './package.json'
+import Aura from '@primevue/themes/aura';
+import pkg from './package.json';
 
 export default defineNuxtConfig({
   future: {
@@ -18,7 +18,6 @@ export default defineNuxtConfig({
     public: {
       APP_VERSION: pkg.version,
       APP_NAME: pkg.name,
-      // eslint-disable-next-line node/prefer-global/process
       APP_MODE: process.env?.NODE_ENV,
     },
   },
@@ -31,7 +30,9 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/fonts',
     '@sfxcode/formkit-primevue-nuxt',
+    '@nuxtjs/supabase',
     '@unocss/nuxt',
+    '@nuxt/eslint',
   ],
   content: {
     highlight: {
@@ -79,5 +80,4 @@ export default defineNuxtConfig({
     client: false,
     server: false,
   },
-
-})
+});

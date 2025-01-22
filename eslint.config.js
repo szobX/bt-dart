@@ -1,15 +1,13 @@
-// eslint.config.js
-import antfu from '@antfu/eslint-config'
+import withNuxt from './.nuxt/eslint.config.mjs';
 
-export default antfu(
-  {
-    // Configures for antfu's config
-  },
-  {
-    rules: {
-      'vue/no-mutating-props': ['error', {
-        shallowOnly: true,
-      }],
-    },
-  },
-)
+export default withNuxt();
+// your custom flat configs go here, for example:
+// {
+//   files: ['**/*.ts', '**/*.tsx'],
+//   rules: {
+//     'no-console': 'off' // allow console.log in TypeScript files
+//   }
+// },
+// {
+//   ...
+// }

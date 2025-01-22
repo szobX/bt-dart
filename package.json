@@ -1,5 +1,5 @@
 {
-  "name": "nuxt3-primevue-starter",
+  "name": "bty-dart",
   "type": "module",
   "version": "2.2.4",
   "license": "MIT",
@@ -27,9 +27,11 @@
     "@iconify-json/twemoji": "^1.2.2",
     "@nuxt/content": "2.13.4",
     "@nuxt/devtools": "^1.7.0",
+    "@nuxt/eslint": "0.7.5",
     "@nuxt/fonts": "^0.10.3",
     "@nuxt/image": "^1.8.1",
     "@nuxt/test-utils": "^3.15.1",
+    "@nuxtjs/supabase": "1.4.5",
     "@pinia/nuxt": "^0.9.0",
     "@primevue/themes": "^4.2.5",
     "@sfxcode/formkit-primevue-nuxt": "^1.2.10",
@@ -53,9 +55,7 @@
     "typescript": "^5.7.2",
     "unstorage": "^1.14.4",
     "vitest": "^2.1.8",
-    "vue-sidebar-menu": "^5.4.2",
-    "vue-router": "^4.5.0"
-
-  },
-  "packageManager": "pnpm@9.15.3+sha512.1f79bc245a66eb0b07c5d4d83131240774642caaa86ef7d0434ab47c0d16f66b04e21e0c086eb61e62c77efc4d7f7ec071afad3796af64892fae66509173893a"
+    "vue-router": "^4.5.0",
+    "vue-sidebar-menu": "^5.4.2"
+  }
 }
