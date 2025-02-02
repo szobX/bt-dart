@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+definePageMeta({
+  middleware: 'auth',
+});
+</script>
 
 <template>
   <div class="card surface-0 text-center">

@@ -16,9 +16,7 @@ const { data: players } = await useAsyncData('players', async () => {
 
   return data;
 });
-onMounted(() => {
-  console.log('players', players);
-});
+onMounted(() => {});
 const onAddPlayers = async (tournamentId) => {
   const payloads = tour.selected.map((player) => ({
     tournament_id: tournamentId,
@@ -32,9 +30,9 @@ const onSave = async () => {
   const payload = { ...tour };
   delete payload.selected;
   const { data } = await client.from('tournaments').insert(payload).select();
-  console.log(data);
   onAddPlayers(data[0].id);
   model.value = false;
+  useRouter().push('/admin/turek/' + data[0].id);
 };
 </script>
 

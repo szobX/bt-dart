@@ -6,6 +6,7 @@ $borderRadius: 12px;
 
 html {
   font-size: 16px;
+  --p-timeline-vertical-event-content-padding: !important;
 }
 
 #workspace {
@@ -36,7 +37,7 @@ html {
 }
 
 .card {
-  padding: 1rem;
+  padding: 0.5rem;
   color: var(--p-text-color);
   margin-bottom: 1rem;
   border-radius: $borderRadius;
@@ -53,7 +54,9 @@ html {
     color: var(--p-primary-color);
   }
 }
-
-.p-inputgroupaddon {
-  color: white !important;
+.p-datatable-tbody > tr > td {
+  text-wrap-mode: nowrap;
 }
+// .p-inputgroupaddon {
+//   color: white !important;
+// }

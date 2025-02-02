@@ -1,4 +1,7 @@
 <script setup lang="ts">
+// definePageMeta({
+//   middleware: 'auth',
+// });
 const { addElement, addList, addListGroup } = useFormKitSchema();
 const { addListGroupFunctions, addGroupButtons, addInsertButton } =
   useFormKitRepeater();

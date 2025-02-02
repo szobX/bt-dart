@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import TipTap from '~/components/tiptap/TipTap.vue'
+definePageMeta({
+  middleware: 'auth',
+});
+import TipTap from '~/components/tiptap/TipTap.vue';
 
-const startText = '<p>I’m running <strong>Tiptap</strong> with <strong>Vue.js</strong> and <strong>Nuxt</strong>. 🎉</p><hr><blockquote><p>Use TipTap ...</p></blockquote>\n'
-const editorValue = ref(startText)
+const startText =
+  '<p>I’m running <strong>Tiptap</strong> with <strong>Vue.js</strong> and <strong>Nuxt</strong>. 🎉</p><hr><blockquote><p>Use TipTap ...</p></blockquote>\n';
+const editorValue = ref(startText);
 
 function resetText() {
-  editorValue.value = startText
+  editorValue.value = startText;
 }
 </script>
 
@@ -25,6 +29,4 @@ function resetText() {
   </div>
 </template>
 
-<style lang='scss'>
-
-</style>
+<style lang="scss"></style>

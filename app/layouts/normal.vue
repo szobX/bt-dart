@@ -9,7 +9,7 @@ const isOnMobile = useState<boolean>('isOnMobile');
     <Toast />
     <div id="normal" :class="[{ collapsed }, { mobile: isOnMobile }]">
       <AppUserTopbar />
-      <div>
+      <div class="h-screen max-w-[1080px] mx-auto">
         <slot />
       </div>
     </div>

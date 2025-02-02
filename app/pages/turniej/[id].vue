@@ -4,9 +4,10 @@ definePageMeta({
 });
 const client = useSupabaseClient<Database>();
 const route = useRoute();
+const isOnMobile = useState<boolean>('isOnMobile');
 
-const { showSuccessMessage, showErrorMessage } = useMessages();
 const matches = ref([]);
+const allmatches = ref([]);
 const tournamentId = ref(route.params.id);
 const { data: tournaments } = await useAsyncData('tournament', async () => {
   const { data } = await client
@@ -17,7 +18,21 @@ const { data: tournaments } = await useAsyncData('tournament', async () => {
   return data;
 });
 const tournament = computed(() => tournaments.value[0]);
+const getH2hStats = async () => {
+  const { data: tournaments, error: tournamentsError } = await client
+    .from('tournaments')
+    .select('id')
+    .eq('league_id', tournament.value.league_id);
+  const tournamentIds = tournaments.map((t) => t.id);
 
+  const { data: h2h, error } = await client
+    .from('matches')
+    .select('id, player1_id, player2_id, winner_id, tournament_id')
+    .in('tournament_id', tournamentIds);
+  if (h2h) {
+    allmatches.value = h2h;
+  }
+};
 const { data: tournamentPlayers } = await useAsyncData('players', async () => {
   const { data } = await client
     .from('tournament_players')
@@ -35,13 +50,60 @@ const getMatches = async () => {
       )
       .eq('tournament_id', route.params.id)
       .order('order');
-    matches.value = data;
+    const h2hStats = h2hmap();
+    matches.value = data.map((match) => {
+      const players = [match.player1_id, match.player2_id].sort((a, b) =>
+        a.localeCompare(b)
+      );
+      const key = `${players[0]}-${players[1]}`;
+      const h2h = h2hStats[key] || { total: 0, p1Wins: 0, p2Wins: 0 };
+
+      // 🛠️ Odwracamy wyniki jeśli `match.player1_id` to nie pierwszy gracz w kluczu
+      return {
+        ...match,
+        h2h:
+          match.player1_id === players[0]
+            ? h2h
+            : { ...h2h, p1Wins: h2h.p2Wins, p2Wins: h2h.p1Wins },
+      };
+    });
   } catch (e) {}
 };
+const h2hmap = () => {
+  const h2hStats: Record<
+    string,
+    { total: number; p1Wins: number; p2Wins: number }
+  > = {};
+  allmatches.value.forEach((match) => {
+    const players = [match.player1_id, match.player2_id].sort((a, b) =>
+      a.localeCompare(b)
+    );
+
+    const key = `${players[0]}-${players[1]}`;
+
+    if (!h2hStats[key]) {
+      h2hStats[key] = { key, total: 0, p1Wins: 0, p2Wins: 0 };
+    }
+
+    h2hStats[key].total += 1;
+
+    if (match.winner_id === match.player1_id) {
+      h2hStats[key].p1Wins += match.player1_id === players[0] ? 1 : 0;
+      h2hStats[key].p2Wins += match.player2_id === players[0] ? 1 : 0;
+    } else if (match.winner_id === match.player2_id) {
+      h2hStats[key].p1Wins += match.player2_id === players[0] ? 1 : 0;
+      h2hStats[key].p2Wins += match.player1_id === players[0] ? 1 : 0;
+    }
+  });
+  return h2hStats;
+};
 onMounted(async () => {
-  await getMatches();
-  // Initial ranking computation
-  await updateRanking();
+  nextTick(async () => {
+    await getH2hStats();
+    await getMatches();
+    // Initial ranking computation
+    await updateRanking();
+  });
 });
 
 const ranking = ref([]); // Change computed to ref
@@ -141,7 +203,7 @@ const updateRanking = () => {
 </script>
 
 <template>
-  <div class="card flex flex-col align-self flex-wrap gap-10">
+  <div class="flex flex-col align-self flex-wrap gap-10">
     <div class="flex gap-2 items-center">
       <h2>{{ tournament.name }}</h2>
       <Tag severity="info">Status: {{ tournament.status }}</Tag>
@@ -149,25 +211,37 @@ const updateRanking = () => {
 
     <div class="flex flex-col gap-2 flex-wrap">
       <h3>Aktualna Tabela</h3>
-      <div v-if="ranking" class="flex gap-2 flex-wrap">
-        <DataTable :value="ranking">
+      <div v-if="ranking">
+        <DataTable
+          scrollable
+          :value="ranking"
+          header="Flex Scroll"
+          :style="{ width: '90vw', maxWidth: '800px' }"
+          maximizable
+          modal
+          :contentStyle="{ height: '300px' }"
+        >
           <Column header="id">
             <template #body="{ index }">
               {{ index + 1 }}
             </template>
           </Column>
           <Column field="nickname" header="nickname"></Column>
+          <Column field="points" header="points"></Column>
           <Column field="games" header="games"></Column>
           <Column field="wins" header="wins"></Column>
           <Column field="loses" header="loses"></Column>
-          <Column field="points" header="points"></Column>
         </DataTable>
       </div>
     </div>
-    <div class="mx-auto w-1/2">
+    <div class="w-full">
       <h3>Mecze</h3>
 
-      <Timeline :value="matches" align="alternate" class="customized-timeline">
+      <Timeline
+        :value="matches"
+        :align="isOnMobile ? 'bottom' : 'alternate'"
+        class="customized-timeline"
+      >
         <template #marker="slotProps">
           <span
             class="flex w-8 h-8 bg-primary items-center justify-center text-white rounded-full z-10 shadow-sm"
@@ -184,43 +258,78 @@ const updateRanking = () => {
           ></div>
         </template>
         <template #content="slotProps">
-          <Card class="mt-4 border !border-green-500">
-            <template #title> Match {{ slotProps.index + 1 }} </template>
-            <template #subtitle>
-              {{ slotProps.item.date }}
+          <Card class="mt-4 border !border-green-500 !px-0">
+            <template #title>
+              <h5 class="my-0 text-base">Match {{ slotProps.index + 1 }}</h5>
             </template>
+
             <template #content>
-              <div class="flex gap-4 !border !border-red-500">
-                <InputGroup>
-                  <InputGroupAddon
-                    class="w-3/4"
-                    :class="{
-                      '!bg-primary':
-                        slotProps.item.player1_id === slotProps.item.winner_id,
-                    }"
-                    >{{ slotProps.item.player1.nickname }}</InputGroupAddon
-                  >
-                  <InputNumber
-                    placeholder="0"
-                    disabled
-                    v-model="slotProps.item.player1_result"
-                  />
-                </InputGroup>
-                <InputGroup>
-                  <InputNumber
-                    placeholder="0"
-                    disabled
-                    v-model="slotProps.item.player2_result"
-                  />
-                  <InputGroupAddon
-                    class="w-3/4"
-                    :class="{
-                      '!bg-primary':
-                        slotProps.item.player2_id === slotProps.item.winner_id,
-                    }"
-                    >{{ slotProps.item.player2.nickname }}</InputGroupAddon
-                  >
-                </InputGroup>
+              <div
+                class="grid grid-cols-2 gap-4 !border !border-red-500 pb-5 relative"
+              >
+                <div>
+                  <InputGroup class="relative">
+                    <InputGroupAddon
+                      @click="
+                        useRouter().push(
+                          `/players/${slotProps.item.player2.id}`
+                        )
+                      "
+                      class="w-3/4 cursor-pointer"
+                      :class="{
+                        '!bg-primary !text-white':
+                          slotProps.item.player1_id ===
+                          slotProps.item.winner_id,
+                      }"
+                      >{{ slotProps.item.player1.nickname }}</InputGroupAddon
+                    >
+                    <InputNumber
+                      class="min-w-[40px]"
+                      placeholder="0"
+                      disabled
+                      v-model="slotProps.item.player1_result"
+                    />
+                  </InputGroup>
+                  <div class="flex justify-center mt-1">
+                    ({{ slotProps.item.h2h.p1Wins }})
+                  </div>
+                </div>
+                <div>
+                  <InputGroup class="relative">
+                    <InputNumber
+                      class="min-w-[40px]"
+                      placeholder="0"
+                      disabled
+                      v-model="slotProps.item.player2_result"
+                    />
+                    <InputGroupAddon
+                      @click="
+                        useRouter().push(
+                          `/players/${slotProps.item.player2.id}`
+                        )
+                      "
+                      class="w-3/4 cursor-pointer"
+                      :class="{
+                        '!bg-primary !text-white':
+                          slotProps.item.player2_id ===
+                          slotProps.item.winner_id,
+                      }"
+                      >{{ slotProps.item.player2.nickname }}</InputGroupAddon
+                    >
+                  </InputGroup>
+                  <div class="flex justify-center mt-1">
+                    ({{ slotProps.item.h2h.p2Wins }})
+                  </div>
+                </div>
+              </div>
+              <div>
+                <matchStats
+                  v-if="
+                    slotProps.item.winner_id &&
+                    Object.keys(slotProps.item.stats).length
+                  "
+                  :match="slotProps.item"
+                />
               </div>
             </template>
           </Card>

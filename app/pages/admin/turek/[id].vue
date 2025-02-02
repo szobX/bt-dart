@@ -1,7 +1,9 @@
 <script setup lang="ts">
 const client = useSupabaseClient<Database>();
 const route = useRoute();
-
+definePageMeta({
+  middleware: 'auth',
+});
 const { showSuccessMessage, showErrorMessage } = useMessages();
 const matches = ref([]);
 const tournamentId = ref(route.params.id);
@@ -94,7 +96,6 @@ const generate = async () => {
     // Rotacja graczy (bez pierwszego)
     roundPlayers.splice(1, 0, roundPlayers.pop()!);
   }
-  console.log();
   // 5️⃣ Zapisujemy mecze w bazie
   const { error: insertError, data } = await client
     .from('matches')
@@ -105,11 +106,13 @@ const generate = async () => {
     return false;
   }
   matches.value = data;
-  await client
-    .from('tournament')
+  const { data: tour } = await client
+    .from('tournaments')
     .update({ status: 'inprogress' })
-    .eq('id', tournamentId.value);
+    .eq('id', tournamentId.value)
+    .select();
   await getMatches();
+  tournaments.value = tour;
 
   showSuccessMessage(' ✅ Mecze Round Robin wygenerowane!');
 };
@@ -130,17 +133,6 @@ const endTournament = async () => {
       return false;
     }
   }
-  // ranking.value.forEach((player, idx) => {
-  //   console.log(player, idx);
-  //   const { error: updateError } = client
-  //     .from('tournament_players')
-  //     .update('end_ranking', idx + 1)
-  //     .match({ tournament_id: tournamentId.value, player_id: player.id });
-  //   if (updateError) {
-  //     console.error('Błąd aktualizacji rankingu:', updateError);
-  //     return false;
-  //   }
-  // });
 
   showSuccessMessage('✅ Turniej zakończony! Rankingi zaktualizowane');
 };
@@ -301,7 +293,12 @@ const updateMatch = async (match, idx) => {
     <div v-if="tournament.status === 'inprogress'">
       <h3>Matches</h3>
 
-      <Timeline :value="matches" align="alternate" class="customized-timeline">
+      <Timeline
+        v-if="matches.length"
+        :value="matches"
+        align="alternate"
+        class="customized-timeline"
+      >
         <template #marker="slotProps">
           <span
             class="flex w-8 h-8 bg-primary items-center justify-center text-white rounded-full z-10 shadow-sm"
@@ -332,7 +329,7 @@ const updateMatch = async (match, idx) => {
                       '!bg-primary':
                         slotProps.item.player1_id === slotProps.item.winner_id,
                     }"
-                    >{{ slotProps.item.player1.nickname }}</InputGroupAddon
+                    >{{ slotProps.item.player1?.nickname }}</InputGroupAddon
                   >
                   <InputNumber
                     placeholder="0"
@@ -350,7 +347,7 @@ const updateMatch = async (match, idx) => {
                       '!bg-primary':
                         slotProps.item.player2_id === slotProps.item.winner_id,
                     }"
-                    >{{ slotProps.item.player2.nickname }}</InputGroupAddon
+                    >{{ slotProps.item.player2?.nickname }}</InputGroupAddon
                   >
                 </InputGroup>
               </div>

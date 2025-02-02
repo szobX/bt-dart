@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { FilterMatchMode } from '@primevue/core/api';
-
+definePageMeta({
+  middleware: 'auth',
+});
 const { tableData, filters, dataTableRef } = usePrimeDataTable();
 const client = useSupabaseClient<Database>();
 
@@ -32,7 +34,7 @@ const pushTo = (data) => {
 
 <template>
   <div class="card">
-    <h2>DataTable Example</h2>
+    <h2>Turnieje</h2>
     <DataTable
       ref="dataTableRef"
       v-model:filters="filters"

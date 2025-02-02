@@ -57,5 +57,8 @@
     "vitest": "^2.1.8",
     "vue-router": "^4.5.0",
     "vue-sidebar-menu": "^5.4.2"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.7"
   }
 }

@@ -21,7 +21,9 @@ export default defineNuxtConfig({
       APP_MODE: process.env?.NODE_ENV,
     },
   },
-
+  supabase: {
+    redirect: false,
+  },
   modules: [
     '@pinia/nuxt',
     '@nuxt/content',

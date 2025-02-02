@@ -1,31 +1,28 @@
-<script setup lang='ts'>
-const config = useRuntimeConfig()
-const { menu } = useNavigationMenu()
+<script setup lang="ts">
+const config = useRuntimeConfig();
+const { menu } = useNavigationMenu();
 
-const collapsed = useState<boolean>('collapsed')
-const isOnMobile = useState<boolean>('isOnMobile')
+const collapsed = useState<boolean>('collapsed');
+const isOnMobile = useState<boolean>('isOnMobile');
 
 function onResize() {
   if (window.innerWidth <= 980) {
-    collapsed.value = true
-    isOnMobile.value = true
-  }
-  else {
-    collapsed.value = false
-    isOnMobile.value = false
+    collapsed.value = true;
+    isOnMobile.value = true;
+  } else {
+    collapsed.value = false;
+    isOnMobile.value = false;
   }
 }
 
-function onToggleCollapse() {
-}
+function onToggleCollapse() {}
 
-function onItemClick() {
-}
+function onItemClick() {}
 
 onMounted(() => {
-  onResize()
-  window.addEventListener('resize', onResize)
-})
+  onResize();
+  window.addEventListener('resize', onResize);
+});
 </script>
 
 <template>
@@ -42,17 +39,19 @@ onMounted(() => {
     >
       <template #header>
         <div v-if="!collapsed" class="flex">
-          <img class="m-6 w-8" src="/primevue-logo.webp" alt="PrimeVue">
-          <img class="m-6 w-8" src="/nuxt-logo.svg" alt="Nuxt">
+          <img class="m-6 w-8" src="/primevue-logo.webp" alt="PrimeVue" />
+          <img class="m-6 w-8" src="/nuxt-logo.svg" alt="Nuxt" />
         </div>
         <div v-else>
-          <img class="ml-4 mt-6 w-6" src="/primevue-logo.webp" alt="PrimeVue">
-          <img class="ml-4 mt-2 w-6" src="/nuxt-logo.svg" alt="Nuxt">
+          <img class="ml-4 mt-6 w-6" src="/primevue-logo.webp" alt="PrimeVue" />
+          <img class="ml-4 mt-2 w-6" src="/nuxt-logo.svg" alt="Nuxt" />
         </div>
       </template>
       <template #footer>
         <div class="m-2 text-center text-xs text-color-primary">
-          <span v-if="!collapsed">PrimeVue-Nuxt Starter {{ config.public.APP_VERSION }}</span>
+          <span v-if="!collapsed"
+            >PrimeVue-Nuxt Starter {{ config.public.APP_VERSION }}</span
+          >
           <span v-if="collapsed">{{ config.public.APP_VERSION }}</span>
         </div>
       </template>
