@@ -1,0 +1,37 @@
+# Pliki i katalogi związane z Dockerem
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Zależności Node.js (będą instalowane w kontenerze)
+node_modules
+# pnpm specyficzny katalog wirtualnego store'a, jeśli byłby tworzony w /app,
+# ale pnpm domyślnie tworzy globalny store
+# .pnpm-store
+
+# Katalogi wyjściowe Nuxt (będą generowane w kontenerze)
+.nuxt
+.output
+dist
+
+# Logi i pliki tymczasowe
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Pliki systemowe
+.DS_Store
+Thumbs.db
+
+# Katalogi IDE
+.vscode/
+.idea/
+
+# Pliki Git
+.git
+.gitignore
+
+# Pliki środowiskowe
+.env
