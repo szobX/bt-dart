@@ -1,7 +1,6 @@
 # --- ETAP 1: Budowanie aplikacji (Builder) ---
 FROM node:20-alpine AS builder 
 
-ENV NODE_ENV=production
 WORKDIR /app
 
 RUN corepack enable pnpm
@@ -9,7 +8,7 @@ RUN corepack enable pnpm
 COPY package.json pnpm-lock.yaml ./
 # COPY .npmrc .npmrc # Jeśli .npmrc jest w root/app/
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install 
 
 COPY . . 
 

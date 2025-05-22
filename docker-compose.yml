@@ -1,7 +1,7 @@
 services:
   app:
     build:
-      context: ./app
+      context: .
       dockerfile: Dockerfile
       # args: # Opcjonalne argumenty budowania
     container_name: dart_app # Zmieniłem nazwę, aby pasowała
