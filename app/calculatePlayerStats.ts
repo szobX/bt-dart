@@ -1,45 +1,73 @@
-export function calculatePlayerStats(playerId, matches) {
-  let stats = {
+export interface PlayerStats {
+  id: string;
+  nickname: string;
+  avgScoreHistory: number[];
+  avgScoreGlobal: number;
+  lastScoreBuckets: Record<string, number>;
+  threeDartsAvgHistory: number[];
+  games: number;
+  wins: number;
+  loses: number;
+  winRate: string;
+  bestCheckout: { score: number; matchId: string };
+  bestAvg: { avg: number; matchId: string };
+  bestLastScore: number;
+  bestWinsAgainst: { name: string; count: number };
+  bestLossesAgainst: { name: string; count: number };
+  form: string;
+}
+
+export interface Match {
+  id: string;
+  created_at: string;
+  tournament: { name: string };
+  player1: { id: string; nickname: string };
+  player2: { id: string; nickname: string };
+  winner_id: string;
+  stats: Record<string, any>;
+}
+
+export function calculatePlayerStats(
+  playerId: string,
+  matches: Match[]
+): PlayerStats {
+  let stats: PlayerStats = {
     id: playerId,
     nickname: '',
+    avgScoreHistory: [],
+    lastScoreBuckets: { '100+': 0, '80+': 0, '60+': 0, '50+': 0, '40+': 0 },
+    threeDartsAvgHistory: [],
+    avgScoreGlobal: 0,
     games: 0,
     wins: 0,
     loses: 0,
-    points: 0,
-    avgScore: 0,
-    bestLastScore: 0,
-    highestCheckout: 0,
-    avgDartsToEnd: 0,
     winRate: '0%',
-    form: [],
-    bestOpponent: { name: '', wins: 0 },
-    worstOpponent: { name: '', losses: 0 },
-    lastScoreBuckets: { '100+': 0, '60+': 0, '50+': 0, '40+': 0 }, // New feature
+    bestCheckout: { score: 0, matchId: '' },
+    bestAvg: { avg: 0, matchId: '' },
+    bestLastScore: 0,
+    bestWinsAgainst: { name: '', count: 0 },
+    bestLossesAgainst: { name: '', count: 0 },
+    form: '',
   };
-
-  let totalScore = 0,
-    totalGamesWithScore = 0,
-    dartsToEnd = [],
-    opponents = {};
+  let totalScore = 0;
+  let totalGamesWithScore = 0;
+  let opponents: Record<
+    string,
+    { name: string; wins: number; losses: number }
+  > = {};
 
   matches.forEach((match) => {
     const isPlayer1 = match.player1.id === playerId;
+    const player = isPlayer1 ? match.player1 : match.player2;
     const opponent = isPlayer1 ? match.player2 : match.player1;
-    const winnerId = match.winner_id;
-    const statsKey = isPlayer1
-      ? match.stats[match.player1.id]
-      : match.stats[match.player2.id];
+    const statsKey = match.stats[playerId];
 
-    stats.nickname = isPlayer1
-      ? match.player1.nickname
-      : match.player2.nickname;
+    stats.nickname = player.nickname;
     stats.games++;
 
-    if (winnerId === playerId) {
+    if (match.winner_id === playerId) {
       stats.wins++;
-      stats.points += 3;
-      dartsToEnd.push(statsKey?.darts || 0);
-      stats.form.push('W');
+      stats.form += 'W ';
       opponents[opponent.id] = opponents[opponent.id] || {
         name: opponent.nickname,
         wins: 0,
@@ -48,7 +76,7 @@ export function calculatePlayerStats(playerId, matches) {
       opponents[opponent.id].wins++;
     } else {
       stats.loses++;
-      stats.form.push('L');
+      stats.form += 'L ';
       opponents[opponent.id] = opponents[opponent.id] || {
         name: opponent.nickname,
         wins: 0,
@@ -56,49 +84,63 @@ export function calculatePlayerStats(playerId, matches) {
       };
       opponents[opponent.id].losses++;
     }
-
-    totalScore += statsKey?.avg || 0;
-    totalGamesWithScore++;
+    if (statsKey?.avg) {
+      totalScore += statsKey.avg;
+      totalGamesWithScore++;
+    }
+    stats.avgScoreHistory.push(statsKey?.avg || 0);
     stats.bestLastScore = Math.max(
       stats.bestLastScore,
       ...(statsKey?.history.map((h) => h.lastScore) || [0])
     );
-    stats.highestCheckout = Math.max(
-      stats.highestCheckout,
-      ...(statsKey?.history
+
+    // Best Checkout
+    const checkouts =
+      statsKey?.history
         .filter((h) => h.actualScore === 0)
-        .map((h) => h.lastScore) || [0])
-    );
-
-    // Categorize lastScore into buckets
-    statsKey?.history.forEach((entry) => {
-      const lastScore = entry.lastScore;
-
-      if (lastScore >= 100) {
-        stats.lastScoreBuckets['100+']++;
-      } else if (lastScore >= 60) {
-        stats.lastScoreBuckets['60+']++;
-      } else if (lastScore >= 50) {
-        stats.lastScoreBuckets['50+']++;
-      } else if (lastScore >= 40) {
-        stats.lastScoreBuckets['40+']++;
+        .map((h) => ({ score: h.lastScore, match: match })) || [];
+    checkouts.forEach((checkout) => {
+      if (checkout.score > stats.bestCheckout.score) {
+        stats.bestCheckout = checkout;
       }
     });
-  });
 
-  stats.avgScore = totalGamesWithScore
-    ? (totalScore / totalGamesWithScore).toFixed(2)
-    : 0;
+    // Best Avg Score
+    if (statsKey?.avg > stats.bestAvg.avg) {
+      stats.bestAvg = { avg: statsKey.avg, match: match };
+    }
+
+    // 3 Darts Avg History
+    statsKey?.history.forEach((entry) => {
+      stats.threeDartsAvgHistory.push(entry.actualAvg);
+    });
+
+    // Last Score Buckets
+    statsKey?.history.forEach((entry) => {
+      const lastScore = entry.lastScore;
+      if (lastScore >= 100) stats.lastScoreBuckets['100+']++;
+      else if (lastScore >= 80) stats.lastScoreBuckets['80+']++;
+      else if (lastScore >= 60) stats.lastScoreBuckets['60+']++;
+      else if (lastScore >= 50) stats.lastScoreBuckets['50+']++;
+      else if (lastScore >= 40) stats.lastScoreBuckets['40+']++;
+    });
+  });
+  stats.avgScoreGlobal =
+    totalGamesWithScore > 0
+      ? parseFloat((totalScore / totalGamesWithScore).toFixed(2))
+      : 0;
+
   stats.winRate = stats.games
     ? ((stats.wins / stats.games) * 100).toFixed(2) + '%'
     : '0%';
 
+  // Find best opponents
   Object.values(opponents).forEach((opponent) => {
-    if (opponent.wins > stats.bestOpponent.wins) {
-      stats.bestOpponent = opponent;
+    if (opponent.wins > stats.bestWinsAgainst.count) {
+      stats.bestWinsAgainst = { name: opponent.name, count: opponent.wins };
     }
-    if (opponent.losses > stats.worstOpponent.losses) {
-      stats.worstOpponent = opponent;
+    if (opponent.losses > stats.bestLossesAgainst.count) {
+      stats.bestLossesAgainst = { name: opponent.name, count: opponent.losses };
     }
   });
 

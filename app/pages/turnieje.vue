@@ -43,6 +43,7 @@ const pushTo = (data) => {
       :rows="20"
       paginator-template="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
       current-page-report-template="Showing {first} to {last} of {totalRecords}"
+      @row-click="pushTo($event.data)"
     >
       <template #empty> No Data Found. </template>
       <Column field="name" header="Name" :sortable="true" />

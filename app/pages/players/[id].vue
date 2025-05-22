@@ -20,7 +20,7 @@ const { data: matches } = await useAsyncData('playerMatches', async () => {
   const { data } = await client
     .from('matches')
     .select(
-      '*, player1:player1_id(id, nickname),player2:player2_id(id,nickname),tournament:tournament_id(id,name)'
+      '*, player1:player1_id(id, nickname,image_url),player2:player2_id(id,nickname,image_url),tournament:tournament_id(id,name)'
     )
     .or(`player1_id.eq.${playerId.value},player2_id.eq.${playerId.value}`)
     .order('created_at', { ascending: false });
@@ -41,10 +41,10 @@ const back = () => {
     <h2>{{ player.nickname }}</h2>
     <div v-if="player">
       <img
-        class="w-[100px] h-auto aspect-square rounded-full object-cover mt-2"
-        src="https://cdn1.iconfinder.com/data/icons/sport-avatar-6/64/09-darts-dart-sport-avatar-man-512.png"
+        class="max-w-[300px] w-full mx-auto h-auto aspect-square rounded-full object-cover mt-2"
+        :src="player.image_url"
       />
-      <PlayerStats :player-id="playerId" :all-matches="matches" />
+      <PlayerProfile :player-id="playerId" :player-matches="matches" />
     </div>
     <div>
       <h3>Matches</h3>
