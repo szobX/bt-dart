@@ -1,5 +1,4 @@
-import type { ToastMessageOptions } from 'primevue/toast'
-import { useToast } from '#imports'
+import type { ToastMessageOptions } from 'primevue/toast';
 
 export enum MessageSeverity {
   SUCCESS = 'success',
@@ -9,27 +8,53 @@ export enum MessageSeverity {
 }
 
 export function useMessages() {
-  const toast = useToast()
+  const toast = useToast();
 
-  function showMessage(severity: ToastMessageOptions['severity'], summary: string, detail: string, life: number = 3000) {
-    toast.add({ severity, summary, detail, life })
+  function showMessage(
+    severity: ToastMessageOptions['severity'],
+    summary: string,
+    detail: string,
+    life: number = 3000
+  ) {
+    toast.add({ severity, summary, detail, life });
   }
 
-  function showSuccessMessage(summary: string, detail: string = summary, life: number = 3000) {
-    showMessage(MessageSeverity.SUCCESS, summary, detail, life)
+  function showSuccessMessage(
+    summary: string,
+    detail: string = summary,
+    life: number = 3000
+  ) {
+    showMessage(MessageSeverity.SUCCESS, summary, detail, life);
   }
 
-  function showInfoMessage(summary: string, detail: string = summary, life: number = 3000) {
-    showMessage(MessageSeverity.INFO, summary, detail, life)
+  function showInfoMessage(
+    summary: string,
+    detail: string = summary,
+    life: number = 3000
+  ) {
+    showMessage(MessageSeverity.INFO, summary, detail, life);
   }
 
-  function showWarnMessage(summary: string, detail: string = summary, life: number = 3000) {
-    showMessage(MessageSeverity.WARN, summary, detail, life)
+  function showWarnMessage(
+    summary: string,
+    detail: string = summary,
+    life: number = 3000
+  ) {
+    showMessage(MessageSeverity.WARN, summary, detail, life);
   }
 
-  function showErrorMessage(summary: string, detail: string = summary, life: number = 3000) {
-    showMessage(MessageSeverity.ERROR, summary, detail, life)
+  function showErrorMessage(
+    summary: string,
+    detail: string = summary,
+    life: number = 3000
+  ) {
+    showMessage(MessageSeverity.ERROR, summary, detail, life);
   }
 
-  return { showSuccessMessage, showInfoMessage, showWarnMessage, showErrorMessage }
+  return {
+    showSuccessMessage,
+    showInfoMessage,
+    showWarnMessage,
+    showErrorMessage,
+  };
 }

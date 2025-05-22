@@ -1,0 +1,17 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # args: # Opcjonalne argumenty budowania
+    container_name: dart_app
+    ports:
+      - '3000:3000'
+
+    restart: unless-stopped
+    networks:
+      xnet_dart:
+        ipv4_address: 192.168.105.2
+networks:
+  xnet_dart:
+    external: true

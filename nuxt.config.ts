@@ -1,5 +1,31 @@
 import Aura from '@primevue/themes/aura';
 import pkg from './package.json';
+export const wrappedPrimeInputs: string[] = [
+  'AutoComplete',
+  'CascadeSelect',
+  'Checkbox',
+  'Chip',
+  'ColorPicker',
+  'DatePicker',
+  'Editor',
+  'InputMask',
+  'InputNumber',
+  'InputOtp',
+  'InputText',
+  'Knob',
+  'Listbox',
+  'MultiSelect',
+  'Password',
+  'RadioButton',
+  'Rating',
+  'Select',
+  'SelectButton',
+  'Slider',
+  'Textarea',
+  'ToggleButton',
+  'ToggleSwitch',
+  'TreeSelect',
+];
 
 export default defineNuxtConfig({
   future: {
@@ -35,6 +61,7 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     '@unocss/nuxt',
     '@nuxt/eslint',
+    '@primevue/nuxt-module',
   ],
   content: {
     highlight: {
@@ -71,6 +98,9 @@ export default defineNuxtConfig({
         },
       },
       ripple: true,
+    },
+    components: {
+      exclude: [...wrappedPrimeInputs, 'Button', 'Form', 'FormField', 'Chart'],
     },
   },
 
