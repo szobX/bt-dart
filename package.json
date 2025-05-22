@@ -2,6 +2,7 @@
   "name": "bt-dart",
   "type": "module",
   "version": "2.2.4",
+  "packageManager": "pnpm@10.11.0",
   "license": "MIT",
   "scripts": {
     "build": "nuxi build",
